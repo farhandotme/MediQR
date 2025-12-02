@@ -37,11 +37,11 @@
 
 | Category     | Tech                          |
 |--------------|-------------------------------|
-| Frontend     | Next.js (App Router), Tailwind CSS |
+| Frontend     | Not decided yet
 | Backend      | Node.js, Express.js           |
 | Database     | MongoDB (Mongoose ODM)        |
 | Authentication | JWT + Refresh Tokens         |
-| File Uploads | Cloudinary           |
-| AI Layer     | OpenAI GPT-4o API             |
+
+And many more
 
 
