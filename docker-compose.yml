@@ -1,0 +1,22 @@
+version: "1.0"
+
+services:
+
+  mongo:
+    image: mongo:5
+    container_name: mongo_db
+    ports:
+      - 27017:27017
+    volumes:
+      - mediQr_db:/data/db
+
+  server:
+    build: ./server
+    container_name: mediQr_server
+    ports:
+      - 8000:8000
+    depends_on:
+      - mongo
+
+volumes:
+  mediQr_db:

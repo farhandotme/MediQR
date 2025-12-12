@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "build": "rimraf dist & npx tsc",
+    "build": "npx rimraf dist & npx tsc",
     "start": "node dist/server.js",
     "dev": "tsc --watch & node --watch dist/server.js"
   },
