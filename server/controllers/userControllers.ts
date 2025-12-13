@@ -5,6 +5,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { generateUniqueId } from "../utils/uniqueID";
 import { generateQrCodeCloudinary } from "../utils/generateQr";
 import { sendVerificationCode, successMessage } from "./sendEmail";
+import userModels from "../models/userModels";
 //Register user
 export const registerUser = async (req: Request, res: Response) => {
   const { fullName, email, password, phone } = req.body;
@@ -35,6 +36,10 @@ export const registerUser = async (req: Request, res: Response) => {
       otp: VerificationCode,
     });
     await sendVerificationCode(email, VerificationCode);
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET!);
+    res.cookie("token", token, {
+      httpOnly: true,
+    });
     return res.status(201).json({ message: "Please verify your email", email });
   } catch (error) {
     console.log(error);
@@ -125,41 +130,62 @@ export const logoutUser = async (req: Request, res: Response) => {
 };
 
 // Update user
+// export const updateUser = async (req: Request, res: Response) => {
+//   try {
+//     const userID = req.params.id;
+//     const {
+//       dateOfBirth,
+//       bloodGroup,
+//       allergies,
+//       medicalConditions,
+//       medications,
+//       emergencyContacts,
+//       qrId,
+//     } = req.body || {};
+
+//     const updates: any = {};
+
+//     if (dateOfBirth) updates.dateOfBirth = new Date(dateOfBirth);
+//     if (bloodGroup) updates.bloodGroup = bloodGroup;
+//     if (allergies) updates.allergies = allergies;
+//     if (medicalConditions) updates.medicalConditions = medicalConditions;
+//     if (medications) updates.medications = medications;
+//     if (emergencyContacts) updates.emergencyContacts = emergencyContacts;
+//     if (qrId) updates.qrId = qrId;
+//     const updatedUser = await User.findByIdAndUpdate(userID, updates, {
+//       new: true,
+//     });
+//     if (!updatedUser) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     res.status(201).json({
+//       message: "User updated successfully",
+//       data: updatedUser,
+//     });
+//   } catch (error) {
+//     console.error("Update Error:", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// };
+
 export const updateUser = async (req: Request, res: Response) => {
   try {
-    const userID = req.params.id;
-    const {
-      dateOfBirth,
-      bloodGroup,
-      allergies,
-      medicalConditions,
-      medications,
-      emergencyContacts,
-      qrId,
-    } = req.body || {};
+    const id = (req as any).data.userId;
+    // const {
+    //   dateOfBirth,
+    //   bloodGroup,
+    //   allergies,
+    //   medicalConditions,
+    //   medications,
+    //   emergencyContacts,
+    // } = req.body || {};
+    const updateData = req.body;
 
-    const updates: any = {};
-
-    if (dateOfBirth) updates.dateOfBirth = new Date(dateOfBirth);
-    if (bloodGroup) updates.bloodGroup = bloodGroup;
-    if (allergies) updates.allergies = allergies;
-    if (medicalConditions) updates.medicalConditions = medicalConditions;
-    if (medications) updates.medications = medications;
-    if (emergencyContacts) updates.emergencyContacts = emergencyContacts;
-    if (qrId) updates.qrId = qrId;
-    const updatedUser = await User.findByIdAndUpdate(userID, updates, {
-      new: true,
+    const updatedUser = await userModels.findByIdAndUpdate(id, updateData);
+    res.status(200).json({
+      updatedUser,
     });
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(201).json({
-      message: "User updated successfully",
-      data: updatedUser,
-    });
-
-
   } catch (error) {
     console.error("Update Error:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -218,5 +244,34 @@ export const uploadReport = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Get Error:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const getAllUsers = await userModels.find();
+    res.json({ getAllUsers });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: "Someting Went Wrong" });
+    }
+  }
+};
+export const DeleteAnUser = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    console.log(id);
+    const deletedUser = await userModels.findByIdAndDelete({ _id: id });
+    res.status(200).json({
+      deletedUser,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    }
   }
 };

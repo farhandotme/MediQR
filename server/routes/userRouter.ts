@@ -1,5 +1,7 @@
 import express from "express";
 import {
+  DeleteAnUser,
+  getAllUsers,
   getUser,
   loginUser,
   logoutUser,
@@ -9,14 +11,17 @@ import {
   updateUser,
   uploadReport,
 } from "../controllers/userControllers";
+import { isloggedin } from "../middlewares/isLoggedin";
 const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
-router.put("/updateUser/:id", updateUser);
+router.patch("/updateUser", isloggedin, updateUser);
 router.get("/profile", getUser);
+router.get("/getAllUser", getAllUsers);
 router.post("/email/verify", otpVerification);
 router.post("/email/resendOtp", resendOtp);
 router.patch("/uploadReport/:id", uploadReport);
+router.delete("/deleteUser/:id", DeleteAnUser);
 
 export default router;
