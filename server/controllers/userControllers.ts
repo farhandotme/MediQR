@@ -4,7 +4,11 @@ import bcryptjs from "bcryptjs";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { generateUniqueId } from "../utils/uniqueID";
 import { generateQrCodeCloudinary } from "../utils/generateQr";
-import { sendVerificationCode, successMessage } from "./sendEmail";
+import {
+  sendForgetPasswordLink,
+  sendVerificationCode,
+  successMessage,
+} from "./sendEmail";
 import userModels from "../models/userModels";
 //Register user
 export const registerUser = async (req: Request, res: Response) => {
@@ -130,59 +134,15 @@ export const logoutUser = async (req: Request, res: Response) => {
 };
 
 // Update user
-// export const updateUser = async (req: Request, res: Response) => {
-//   try {
-//     const userID = req.params.id;
-//     const {
-//       dateOfBirth,
-//       bloodGroup,
-//       allergies,
-//       medicalConditions,
-//       medications,
-//       emergencyContacts,
-//       qrId,
-//     } = req.body || {};
-
-//     const updates: any = {};
-
-//     if (dateOfBirth) updates.dateOfBirth = new Date(dateOfBirth);
-//     if (bloodGroup) updates.bloodGroup = bloodGroup;
-//     if (allergies) updates.allergies = allergies;
-//     if (medicalConditions) updates.medicalConditions = medicalConditions;
-//     if (medications) updates.medications = medications;
-//     if (emergencyContacts) updates.emergencyContacts = emergencyContacts;
-//     if (qrId) updates.qrId = qrId;
-//     const updatedUser = await User.findByIdAndUpdate(userID, updates, {
-//       new: true,
-//     });
-//     if (!updatedUser) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     res.status(201).json({
-//       message: "User updated successfully",
-//       data: updatedUser,
-//     });
-//   } catch (error) {
-//     console.error("Update Error:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
 
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const id = (req as any).data.userId;
-    // const {
-    //   dateOfBirth,
-    //   bloodGroup,
-    //   allergies,
-    //   medicalConditions,
-    //   medications,
-    //   emergencyContacts,
-    // } = req.body || {};
     const updateData = req.body;
 
-    const updatedUser = await userModels.findByIdAndUpdate(id, updateData);
+    const updatedUser = await userModels.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
     res.status(200).json({
       updatedUser,
     });
@@ -271,6 +231,79 @@ export const DeleteAnUser = async (req: Request, res: Response) => {
     if (error instanceof Error) {
       res.status(500).json({
         message: error.message,
+      });
+    }
+  }
+};
+
+export const forgetPasswordSendEmail = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    const user = await userModels.findOne({ email });
+    if (!user) {
+      res.status(404).json({
+        message: "User not found",
+      });
+    }
+    const resetLink = `${process.env.FRONTEND_URL}/api/users/changePassword/${user?._id}`;
+    await sendForgetPasswordLink(email, resetLink);
+    res.status(200).json({
+      message: "A verification Link has been sent to your email",
+      email,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        error,
+      });
+    }
+  }
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    const { password } = req.body;
+    const user = await userModels.findById(id);
+
+    if (!password) {
+      res.status(404).json({
+        message: "Please provide a new password",
+      });
+    }
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+    }
+
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    console.log(hashedPassword);
+
+    const changePass = await userModels.findByIdAndUpdate(
+      id,
+      {
+        password: hashedPassword,
+      },
+      { new: true }
+    );
+    console.log(changePass);
+    res.status(200).json({
+      message: "Password Successfully Changed",
+      changePass,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        error,
       });
     }
   }

@@ -254,6 +254,79 @@ export const successMessage = async (
   }
 };
 
+export const sendForgetPasswordLink = async (
+  email: string,
+  resetLink: string
+): Promise<{ success: boolean; data?: any; error?: any }> => {
+  try {
+    const content = `
+      <div class="main-content">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h2 style="color: #10b981; margin-bottom: 15px; font-size: 28px;">
+            Reset Your Password
+          </h2>
+          <p style="color: #475569; font-size: 18px;">
+            We received a request to reset your Medi QR account password.
+          </p>
+        </div>
+
+        <div style="text-align: center; margin: 40px 0;">
+          <a
+            href="${resetLink}"
+            style="
+              display: inline-block;
+              padding: 14px 28px;
+              background-color: #10b981;
+              color: #ffffff;
+              text-decoration: none;
+              font-size: 16px;
+              font-weight: 600;
+              border-radius: 8px;
+            "
+          >
+            Reset Password
+          </a>
+        </div>
+
+        <div style="margin-top: 30px;">
+          <p style="color: #475569; font-size: 15px; line-height: 1.8;">
+            This link will expire in <strong>15 minutes</strong>.
+            If you didn’t request a password reset, you can safely ignore this email.
+          </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+          <p style="color: #64748b; font-size: 14px;">
+            © Medi QR — Your Digital Healthcare Companion
+          </p>
+        </div>
+      </div>
+    `;
+
+    const { data, error } = await resend.emails.send({
+      from: "Medi QR <onboarding@resend.dev>",
+      to: [email],
+      subject: "Reset Your Medi QR Password",
+      html: getEmailTemplate(content, "Reset Your Password", "#10b981"),
+      headers: {
+        "X-Priority": "3",
+        "X-Mailer": "Medi QR System",
+      },
+    });
+
+    if (error) {
+      console.error("Resend error:", error);
+      return { success: false, error };
+    }
+
+    console.log("Password reset email sent:", data?.id);
+    return { success: true, data };
+  } catch (err) {
+    console.error("Unexpected error:", err);
+    return { success: false, error: err };
+  }
+};
+
 export const receivedApplicationOfDoctor = async (
   email: string,
   doctorName?: string
@@ -378,7 +451,7 @@ export const doctorApprovalMessage = async (
     const { data, error } = await resend.emails.send({
       from: "Medi QR <onboarding@resend.dev>",
       to: [email],
-      subject: "🎉 Doctor Application Approved - Welcome to Medi QR!",
+      subject: "Doctor Application Approved - Welcome to Medi QR!",
       html: getEmailTemplate(content, "Application Approved", "#10b981"),
     });
 

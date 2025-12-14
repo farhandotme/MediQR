@@ -1,6 +1,8 @@
 import express from "express";
 import {
+  changePassword,
   DeleteAnUser,
+  forgetPasswordSendEmail,
   getAllUsers,
   getUser,
   loginUser,
@@ -23,5 +25,7 @@ router.post("/email/verify", otpVerification);
 router.post("/email/resendOtp", resendOtp);
 router.patch("/uploadReport/:id", uploadReport);
 router.delete("/deleteUser/:id", DeleteAnUser);
+router.post("/sendForgetPasswordLink", forgetPasswordSendEmail);
+router.patch("/changePassword/:id", changePassword);
 
 export default router;
