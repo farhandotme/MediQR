@@ -5,7 +5,6 @@ import { router } from "expo-router";
 
 const Onboarding1 = () => {
   const progressAnim = useRef(new Animated.Value(0)).current;
-  console.log(progressAnim);
 
   useEffect(() => {
     Animated.timing(progressAnim, {

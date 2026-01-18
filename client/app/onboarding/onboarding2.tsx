@@ -1,44 +1,82 @@
-import { Dimensions, FlatList, Image } from "react-native";
-import React from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  ImageSourcePropType,
+  Text,
+  View,
+} from "react-native";
+import React, { useEffect, useRef } from "react";
+
+import Onboarding from "react-native-onboarding-swiper";
+import LottieView from "lottie-react-native";
 
 const { height, width } = Dimensions.get("window");
 
+interface lottieSlideProps {
+  source: any;
+}
+const LottieSlide = ({ source }: lottieSlideProps) => {
+  const animationRef = useRef<LottieView>(null);
+  useEffect(() => {
+    animationRef.current?.play();
+    animationRef.current?.play(30, 120);
+  }, []);
+  return (
+    <LottieView
+      ref={animationRef}
+      source={source}
+      autoPlay
+      loop
+      style={{ width: 300, height: 300 }}
+    />
+  );
+};
+
 const slides = [
   {
-    id: "1",
-    image: require("../../assets/images/onboarding.png"),
+    backgroundColor: "white",
+    image: (
+      <View>
+        <LottieSlide
+          source={require("../../assets/lottie/OnlineDoctor.json")}
+        />
+      </View>
+    ),
     title: "Instant Emargency Access",
-    discription:
+    subtitle:
       "Doctor Can Instantly access Life-Saving Medical Information by Scanning your QR",
   },
   {
-    id: "2",
-    image: require("../../assets/images/onboarding2.png"),
+    backgroundColor: "white",
+    image: (
+      <View>
+        <LottieSlide source={require("../../assets/lottie/Time Table.json")} />
+      </View>
+    ),
     title: "Every Second Matters",
-    discription:
+    subtitle:
       "Blood group ,allergies and conditions available when you can't speak",
   },
   {
-    id: "3",
-    image: require("../../assets/images/onboarding3.png"),
+    backgroundColor: "white",
+    image: (
+      <View>
+        <LottieSlide source={require("../../assets/lottie/Security.json")} />
+      </View>
+    ),
     title: "Private and Secure",
-    discription:
-      "Your data is encrypted and visible only in Medical Emargencies ",
+    subtitle: "Your data is encrypted and visible only in Medical Emargencies ",
   },
 ];
 
 const onboarding2 = () => {
   return (
-    <SafeAreaView className="flex-1">
-      <FlatList
-        horizontal
-        data={slides}
-        contentContainerStyle={{ height: height * 0.75 }}
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => <Slide item={item} />}
-      />
-    </SafeAreaView>
+    <Onboarding
+      titleStyles={{ fontWeight: "bold" }}
+      containerStyles={{}}
+      pages={slides}
+    />
   );
 };
 

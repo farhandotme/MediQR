@@ -112,7 +112,7 @@ export const loginUser = async (req: Request, res: Response) => {
     }
     const isPasswordValid = await bcryptjs.compare(
       password,
-      user.password || ""
+      user.password || "",
     );
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });
@@ -169,7 +169,7 @@ export const getUser = async (req: Request, res: Response): Promise<void> => {
     }
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET as string
+      process.env.JWT_SECRET as string,
     ) as DecodedToken;
     const user = await User.findById(decoded.userId).select("-password");
     if (!user) {
@@ -289,7 +289,7 @@ export const changePassword = async (req: Request, res: Response) => {
       {
         password: hashedPassword,
       },
-      { new: true }
+      { new: true },
     );
     console.log(changePass);
     res.status(200).json({
