@@ -1,15 +1,9 @@
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  ImageSourcePropType,
-  Text,
-  View,
-} from "react-native";
+import { Dimensions, View } from "react-native";
 import React, { useEffect, useRef } from "react";
 
 import Onboarding from "react-native-onboarding-swiper";
 import LottieView from "lottie-react-native";
+import { router } from "expo-router";
 
 const { height, width } = Dimensions.get("window");
 
@@ -73,9 +67,22 @@ const slides = [
 const onboarding2 = () => {
   return (
     <Onboarding
-      titleStyles={{ fontWeight: "bold" }}
-      containerStyles={{}}
+      onSkip={() => {
+        router.replace("/registerPage/registerpage");
+      }}
+      onDone={() => {
+        router.replace("/registerPage/registerpage");
+      }}
       pages={slides}
+      titleStyles={{ fontWeight: "bold", marginHorizontal: 0, lineHeight: 0 }}
+      subTitleStyles={{
+        marginLeft: 50,
+        marginRight: 50,
+        fontWeight: "700",
+        marginHorizontal: 0,
+        lineHeight: 0,
+      }}
+      imageContainerStyles={{ marginBottom: 0, marginHorizontal: 0 }}
     />
   );
 };

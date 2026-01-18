@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from "react-native";
+import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const registerpage = () => {
   return (
-    <View>
+    <SafeAreaView>
       <Text>registerpage</Text>
-    </View>
-  )
-}
+    </SafeAreaView>
+  );
+};
 
-export default registerpage
+export default registerpage;
