@@ -13,7 +13,7 @@ const Onboarding1 = () => {
       useNativeDriver: false,
     }).start();
     setTimeout(() => {
-      router.push("/onboarding/onboarding2");
+      router.push("/onboarding/onboarding3");
     }, 2500);
   }, []);
 

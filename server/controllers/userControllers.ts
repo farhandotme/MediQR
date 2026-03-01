@@ -46,7 +46,7 @@ export const registerUser = async (req: Request, res: Response) => {
     });
     return res.status(201).json({ message: "Please verify your email", email });
   } catch (error) {
-    console.log(error);
+    console.log("user register error : ", error);
     return res.status(500).json({ message: "Error registering user" });
   }
 };

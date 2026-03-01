@@ -59,6 +59,7 @@ export const registerDoctor = async (req: Request, res: Response) => {
 };
 
 //Login doctor
+
 export const loginDoctor = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const doctor = await doctorModels.findOne({ email });
@@ -81,6 +82,9 @@ export const loginDoctor = async (req: Request, res: Response) => {
   return res.status(200).json({ message: "Login successful", data: doctor });
 };
 
+
+// update the doctor
+
 export const updateDoctorProfile = async (req: Request, res: Response) => {
   const doctorId = req.params.id;
   const { fullName, email, phone, specialization, hospitalName, profileImage } =
@@ -89,14 +93,12 @@ export const updateDoctorProfile = async (req: Request, res: Response) => {
   const updatedDoctor = await doctorModels.findByIdAndUpdate(
     doctorId,
     {
-      fullName,
-      email,
       phone,
       specialization,
       hospitalName,
       profileImage,
     },
-    { new: true }
+    { new: true },
   );
 
   if (!updatedDoctor) {
