@@ -28,6 +28,7 @@ export interface IUser extends Document {
   otp?: number;
   createdAt?: Date;
   updatedAt?: Date;
+  refreshToken?: string;
 }
 const EmergencyContactSchema: Schema = new Schema({
   name: { type: String, required: true },
@@ -56,7 +57,8 @@ const UserSchema: Schema<IUser> = new Schema(
     reports: { type: [ReportSchema], default: [] },
     otp: { type: Number, default: null },
     isVerified: { type: Boolean, default: false },
+    refreshToken: { type: String, default: undefined },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 export default mongoose.model<IUser>("User", UserSchema);

@@ -10,6 +10,46 @@ import {
   successMessage,
 } from "./sendEmail";
 import userModels from "../models/userModels";
+
+const generateAccessAndRefreshToken = async (
+  id: String,
+  res: Response,
+  req: Request,
+) => {
+  try {
+    const user = await userModels.findById(id);
+    const newRefreshToken = jwt.sign(id, process.env.JWT_SECRET!, {
+      expiresIn: "1d",
+    });
+    const newAccessToken = jwt.sign(id, process.env.JWT_SECRET!, {
+      expiresIn: "1d",
+    });
+
+    await userModels.findByIdAndUpdate(
+      id,
+      {
+        $set: { refreshToken: newRefreshToken },
+      },
+      { new: true, runValidators: true },
+    );
+
+    res
+      .cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      })
+      .cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+
+    return { newRefreshToken, newAccessToken };
+  } catch (error) {
+    res.status(500).json({ message: error });
+  }
+};
 //Register user
 export const registerUser = async (req: Request, res: Response) => {
   const { fullName, email, password, phone } = req.body;
@@ -40,10 +80,7 @@ export const registerUser = async (req: Request, res: Response) => {
       otp: VerificationCode,
     });
     await sendVerificationCode(email, VerificationCode);
-    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET!);
-    res.cookie("token", token, {
-      httpOnly: true,
-    });
+    await generateAccessAndRefreshToken(newUser?._id.toString(), res, req);
     return res.status(201).json({ message: "Please verify your email", email });
   } catch (error) {
     console.log("user register error : ", error);
@@ -73,6 +110,7 @@ export const otpVerification = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Error verifying OTP" });
   }
 };
+
 export const resendOtp = async (req: Request, res: Response) => {
   const { email } = req.body;
 
